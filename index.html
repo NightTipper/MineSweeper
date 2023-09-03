@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MineSweeper Game!</title>
+    <link rel="stylesheet" href="styles.css">
+    
+</head>
+<body>
+    <header>
+        <h1>MineSweeper Game</h1>
+        <div id="DiffLevelWrapper">
+            <div id="DiffLevelContainer">
+                <label for="DifficultyLevel">Choose a difficulty level:</label>
+        
+                <select name="DifficultyLevel" id="DifficultyLevel">
+                    <option value = "Beginner" data-level="Beginner"> Beginner </option>
+                    <option value = "Advance" data-level="Advance"> Advance </option>
+                    <option value = "Expert" data-level="Expert"> Expert </option>
+                    <option value = "Master" data-level="Master"> Master </option>
+                </select>
+
+            </div>
+            
+            <div id="StartedGame" style="display: none;">
+                <p id="DifficultySelected"></p>
+                <p id = "Mines-Count"> Mines: <span id="MineCounter"></span></p>
+            </div>
+            
+        </div>
+        
+    </header>
+    
+    <Main>
+        <br>
+        <Button onclick="startGame()" id="PlayButton">Play Minesweeper Game!</Button>
+
+        <div id="gameStart" style="display: none;">
+    
+            <div id="gameGrid"></div>
+            <br>
+            <button id=flagMine> 🚩 </button>
+
+            <button onclick="restartGame()" type="reset"id="resetButton">
+                Reset Game
+            </button>
+
+        </div>
+    </Main>
+    
+    <script src="app.js"></script>
+</body>
+</html>
