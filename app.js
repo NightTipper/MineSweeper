@@ -52,7 +52,7 @@ function flagTile() {
         tile.innerText = "";
     }
     return;
-};
+}
 
 //Do something to the tile, depending on the mouse click
 function clickedTile(e) {
