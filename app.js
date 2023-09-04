@@ -11,6 +11,7 @@ let gameOver = false;
 let selectedDifficulty = 'Beginner';
 let flagIcon = "🚩";
 
+
 // Change the difficulty of the game
 DifficultyLevel.onchange = function() {
     selectedDifficulty = this.options[this.selectedIndex].getAttribute('data-level');
@@ -45,7 +46,7 @@ function updateLevelSettings() {
     }
 };
 
-function flagTile() {
+function flagTile(tile) {
     if (tile.innerText == "") {
         tile.innerText = "🚩";
     } else if (tile.innerText == "🚩") {
@@ -54,18 +55,41 @@ function flagTile() {
     return;
 }
 
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
+
+function createMines() {
+    for (var m = 0; m<minesCount; m++) {
+        var xMine = getRandomInt(rows);
+        var yMine = getRandomInt(columns);
+        var newMine = xMine + "-" + yMine;
+        if (minesLoc.includes(newMine)) {
+            console.log("Dupe Mine, none added")
+            m--
+        } else {
+            minesLoc.push(newMine)
+        }
+    }
+    console.log(minesLoc)
+}
+
 //Do something to the tile, depending on the mouse click
 function clickedTile(e) {
+    var targetTile = e.target
     if (e.which === 1 || e.button === 0) {
         console.log("left click");
+        if (minesLoc.includes(targetTile.id)) {
+            console.log("oh no, you lose!")
+            document.getElementById(targetTile.id).innerText == "💣";
+        }
     }
     else if (e.which === 3 || e.button === 2) {
         console.log("right click"); 
         document.addEventListener('contextmenu', e => e?.cancelable && e.preventDefault());
-        
-        
+        flagTile(targetTile)
     } else {
-        console.log("No mouse event registered");
+        return;
     }
 };
 
@@ -110,6 +134,7 @@ function startGame() {
         gameGrid.push(row);
     }
     console.log(gameGrid)
+    createMines()
 
 }
 
@@ -132,6 +157,7 @@ function restartGame() {
     rows = 0;
     columns = 0;
     gameGrid = [];
+    minesLoc = [];
 
 }
 
