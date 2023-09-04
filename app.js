@@ -9,6 +9,7 @@ let tilesClick = 0;
 let flag = false;
 let gameOver = false;
 let selectedDifficulty = 'Beginner';
+let flagIcon = "🚩";
 
 // Change the difficulty of the game
 DifficultyLevel.onchange = function() {
@@ -41,6 +42,30 @@ function updateLevelSettings() {
         columns = 8;
         gameGridWidth = '400px';
         gameGridHeight = '400px';
+    }
+};
+
+function flagTile() {
+    if (tile.innerText == "") {
+        tile.innerText = "🚩";
+    } else if (tile.innerText == "🚩") {
+        tile.innerText = "";
+    }
+    return;
+};
+
+//Do something to the tile, depending on the mouse click
+function clickedTile(e) {
+    if (e.which === 1 || e.button === 0) {
+        console.log("left click");
+    }
+    else if (e.which === 3 || e.button === 2) {
+        console.log("right click"); 
+        document.addEventListener('contextmenu', e => e?.cancelable && e.preventDefault());
+        
+        
+    } else {
+        console.log("No mouse event registered");
     }
 };
 
@@ -78,6 +103,7 @@ function startGame() {
         for (let cols = 0; cols < columns; cols++) {
             let tile = document.createElement("div");
             tile.id = r.toString() + "-" + cols.toString();
+            tile.addEventListener("mousedown", clickedTile);
             document.getElementById("gameGrid").append(tile);
             row.push(tile);
         }
@@ -108,6 +134,10 @@ function restartGame() {
     gameGrid = [];
 
 }
+
+// function setFlag(e) {
+    
+// };
 
 
 
