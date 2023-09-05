@@ -5,11 +5,8 @@ let columns = 0;
 let gameGridWidth = 0;
 let minesCount = 10;
 let minesLoc = [];
-let tilesClick = 0;
-let flag = false;
-let gameOver = false;
+let tilesClicked = 0;
 let selectedDifficulty = 'Beginner';
-let flagIcon = "🚩";
 
 
 // Change the difficulty of the game
@@ -46,6 +43,12 @@ function updateLevelSettings() {
     }
 };
 
+function checkBox(tile) {
+    // Function to check the alternatives boxes for any other mines.
+    console.log("Checking other boxes...")
+    
+}
+
 function flagTile(tile) {
     if (tile.innerText == "") {
         tile.innerText = "🚩";
@@ -60,10 +63,10 @@ function getRandomInt(max) {
   }
 
 function createMines() {
-    for (var m = 0; m<minesCount; m++) {
-        var xMine = getRandomInt(rows);
-        var yMine = getRandomInt(columns);
-        var newMine = xMine + "-" + yMine;
+    for (let m = 0; m<minesCount; m++) {
+        let xMine = getRandomInt(rows);
+        let yMine = getRandomInt(columns);
+        let newMine = xMine + "-" + yMine;
         if (minesLoc.includes(newMine)) {
             console.log("Dupe Mine, none added")
             m--
@@ -74,24 +77,131 @@ function createMines() {
     console.log(minesLoc)
 }
 
-//Do something to the tile, depending on the mouse click
-function clickedTile(e) {
-    var targetTile = e.target
-    if (e.which === 1 || e.button === 0) {
-        console.log("left click");
-        if (minesLoc.includes(targetTile.id)) {
-            console.log("oh no, you lose!")
-            document.getElementById(targetTile.id).innerText == "💣";
+function revealMines() {
+    for (let r= 0; r < rows; r++) {
+        for (let c = 0; c < columns; c++) {
+            let tile = gameGrid[r][c];
+            if (minesLoc.includes(tile.id)) {
+                if (tile.innerText == "🚩") {
+                    tile.innerText = '❌'
+                    tile.style.backgroundColor = "orange";
+                } else {
+                    tile.innerText = "💣";
+                    tile.style.backgroundColor = "red";                
+                }
+            }
         }
     }
+}
+
+function checkFlaggedMine(tile) {
+    if (tile.innerText == "🚩") {
+        console.log("Safe!")
+        return
+    } else {
+        tile.innerText = "💣";
+        revealMines()
+        console.log("Oh no, you lose!!")
+    }
+}
+
+//Do something to the tile, depending on the mouse click
+function clickedTile(e) {
+    let targetTile = e.target
+    if (e.which === 1 || e.button === 0) {
+        if (minesLoc.includes(targetTile.id)) {
+            checkFlaggedMine(targetTile);
+        } else {
+            let coords = targetTile.id.split("-"); 
+            let r = parseInt(coords[0]);
+            let c = parseInt(coords[1]);
+            checkBox(r, c);
+        }
+        console.log(tilesClicked);
+    }
     else if (e.which === 3 || e.button === 2) {
-        console.log("right click"); 
         document.addEventListener('contextmenu', e => e?.cancelable && e.preventDefault());
         flagTile(targetTile)
+        console.log(tilesClicked);
     } else {
         return;
     }
 };
+
+
+function checkBox(r, c) {
+    if (r < 0 || r >= rows || c < 0 || c >= columns) {
+        return;
+    }
+    if (gameGrid[r][c].classList.contains("tile-clicked")) {
+        return;
+    }
+
+    gameGrid[r][c].classList.add("tile-clicked");
+    tilesClicked += 1;
+
+    let minesFound = 0;
+
+    //top 3
+    minesFound += checkTile(r-1, c-1);      //top left
+    minesFound += checkTile(r-1, c);        //top 
+    minesFound += checkTile(r-1, c+1);      //top right
+
+    //left and right
+    minesFound += checkTile(r, c-1);        //left
+    minesFound += checkTile(r, c+1);        //right
+
+    //bottom 3
+    minesFound += checkTile(r+1, c-1);      //bottom left
+    minesFound += checkTile(r+1, c);        //bottom 
+    minesFound += checkTile(r+1, c+1);      //bottom right
+
+    if (minesFound > 0) {
+        gameGrid[r][c].innerText = minesFound;
+        gameGrid[r][c].classList.add("x" + minesFound.toString());
+    }
+    else {
+        gameGrid[r][c].innerText = "";
+        
+        //top 3
+        checkBox(r-1, c-1);    //top left
+        checkBox(r-1, c);      //top
+        checkBox(r-1, c+1);    //top right
+
+        //left and right
+        checkBox(r, c-1);      //left
+        checkBox(r, c+1);      //right
+
+        //bottom 3
+        checkBox(r+1, c-1);    //bottom left
+        checkBox(r+1, c);      //bottom
+        checkBox(r+1, c+1);    //bottom right
+    }
+
+    if (tilesClicked == rows * columns - minesCount) {
+        console.log("Game Completed!")
+        console.log(tilesClicked)
+        document.getElementById("MineCounter").innerText = "Cleared";
+        let CompletionMessage = document.createElement("div");
+        CompletionMessage.id = "CompletionMessage";
+        document.getElementById(CompletionMessage).innerText = "Congratulations!";
+        document.getElementById("resetButton").append(CompletionMessage)
+
+
+        //add in a congratulations message, and display button to play again
+        gameOver = true;
+    }
+}
+
+function checkTile(r, c) {
+    if (r < 0 || r >= rows || c < 0 || c >= columns) {
+        return 0;
+    }
+    if (minesLoc.includes(r.toString() + "-" + c.toString())) {
+        return 1;
+    }
+    return 0;
+}
 
 
 window.addEventListener('load', () => {
